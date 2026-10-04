@@ -11,6 +11,14 @@ let notes = [];
 function render(notesToDisplay = notes) {
     notesList.textContent = "";
 
+    if (notesToDisplay.length === 0) {
+        noteCount.textContent = "You have no notes yet.";
+    } else if (notes.length === 1) {
+        noteCount.textContent = "You have 1 note.";
+    } else {
+        noteCount.textContent = `You have ${notes.length} notes.`;
+    }
+
     notesToDisplay.forEach(note => {
         const li = document.createElement("li");
         li.classList.add("note", `category-${note.category}`);
@@ -29,6 +37,11 @@ function render(notesToDisplay = notes) {
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Delete";
 
+        deleteButton.addEventListener("click", function () {
+            notes = notes.filter(item => item.id !== note.id);
+            render();
+        });
+
         li.appendChild(text);
         li.appendChild(category);
         li.appendChild(document.createElement("br"));
@@ -43,9 +56,23 @@ function render(notesToDisplay = notes) {
 form.addEventListener("submit", function (event) {
     event.preventDefault();
 
+    const text = noteInput.value.trim();
+
+    if (text.length === 0) {
+        errorMessage.textContent = "Please type a note first.";
+        return;
+    }
+
+    if (text.length > 200) {
+        errorMessage.textContent = "Notes must be 200 characters or fewer.";
+        return;
+    }
+
+    errorMessage.textContent = "";
+
     const note = {
         id: Date.now(),
-        text: noteInput.value,
+        text: text,
         category: noteCategory.value,
         createdAt: new Date().toLocaleString()
     };
